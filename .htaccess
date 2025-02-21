@@ -1,0 +1,27 @@
+# Set default file to load
+DirectoryIndex loader.php
+
+# Disable directory listing
+Options -Indexes
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Custom error pages
+ErrorDocument 404 http://localhost/crud/error/404.php
+ErrorDocument 403 http://localhost/crud/error/403.php
+
+
+# Allow access to loader.php
+<Files "loader.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Allow access to admin/index.php
+<Files "http://localhost/crud/admin/index.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+
