@@ -115,23 +115,23 @@ $newsList = $stmt->fetchAll();
     <?php include 'navbar-a.php'; ?>
 
     <div class="flex-1 overflow-y-auto p-6 bg-gray-100">
-        <div class="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md">
-            <h2 class="text-2xl font-bold mb-4">Add / Edit News & Events</h2>
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                <input type="hidden" name="id" id="news_id">
-                <input type="text" name="title" id="title" placeholder="News Title" required class="w-full px-4 py-2 border rounded mb-2">
-                <textarea name="content" id="content" placeholder="News Content" required class="w-full px-4 py-2 border rounded mb-2"></textarea>
-                <input type="date" name="date" id="date" required class="w-full px-4 py-2 border rounded mb-2">
-                <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded mb-2">
-                <div id="imagePreview"></div>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-            </form>
-        </div>
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Add / Edit News & Events</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <input type="hidden" name="id" id="news_id">
+            <input type="text" name="title" id="title" placeholder="News Title" required class="w-full px-4 py-2 border rounded mb-2">
+            <textarea name="content" id="content" placeholder="News Content" class="w-full px-4 py-2 border rounded mb-2 min-h-[200px]"></textarea>
+            <input type="date" name="date" id="date" class="w-full px-4 py-2 border rounded mb-2">
+            <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded mb-2">
+            <div id="imagePreview"></div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+        </form>
+    </div>
 
-        <div class="max-w-4xl mx-auto mt-6">
-            <h2 class="text-2xl font-bold mb-4">News & Events</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="max-w-6xl mx-auto mt-6">
+        <h2 class="text-2xl font-bold mb-4">News & Events</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <?php foreach ($newsList as $news): ?>
                     <div class="bg-white p-4 rounded-md shadow-md">
                         <?php if (!empty($news['image'])): ?>
@@ -202,7 +202,9 @@ function closeModal() {
     document.getElementById("title").value = title;
     document.getElementById("content").value = content;
     document.getElementById("date").value = date;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const formContainer = document.querySelector(".max-w-6xl"); // Target the form container
+    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function confirmDelete(id) {
@@ -210,6 +212,5 @@ function confirmDelete(id) {
         window.location.href = "addnews.php?delete=" + id;
     }
 }
-
 </script>
 
