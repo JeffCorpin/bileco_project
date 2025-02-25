@@ -101,13 +101,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     </a>
 </div>
 
-
-
-
-
     </div>
 </nav>
-
 
 <!-- ✅ Mobile Navigation Bar (NO MENU) -->
 <div class="lg:hidden sticky top-0 z-30 w-full bg-[#13274F] h-14 flex items-center px-4 z-50">

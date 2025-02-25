@@ -35,7 +35,7 @@
             <a href="index.php" class="block px-4 py-2 text-lg hover:bg-gray-700">Home</a>
            
             <a href="dashboard.php" class="block px-4 py-2 text-lg hover:bg-gray-700">Dashboard</a>
-            <a href="addnews.php" class="block px-4 py-2 text-lg hover:bg-gray-700">News & Events</a>
+            <a href="newslist.php" class="block px-4 py-2 text-lg hover:bg-gray-700">News & Events</a>
             <hr class="border-white-200">
             <a href="<?php echo BASE_URL; ?>auth/logout.php" class="block px-4 py-2 text-lg hover:bg-gray-700">Logout</a>
         </nav>
