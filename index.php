@@ -7,6 +7,11 @@ include 'components/header.php';
 $database = new conn();
 $conn = $database->conn; // Get the PDO connection
 
+// Fetch news
+$stmt = $conn->prepare("SELECT * FROM news ORDER BY date DESC");
+$stmt->execute();
+$newsList = $stmt->fetchAll();
+
 // Check if the user is logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
@@ -203,21 +208,53 @@ if ($user_status === 'online') {
 
 
 <!-- News & Sidebar Section -->
-<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 pt-20">
-    <!-- News & Events -->
-    <div class="bg-[#002D62] p-4 text-white min-h-[250px]">
-        <h2 class="text-lg font-bold text-yellow-500">NEWS & EVENTS</h2>
-        <ul class="mt-2 space-y-2">
-            <li class="border-b pb-1">
-                <h3 class="font-semibold text-yellow-300 text-sm">BILECO Notice of District Elections</h3>
-                <p class="text-xs">BILECO will be conducting its regular district elections...</p>
-            </li>
-            <li class="border-b pb-1">
-                <h3 class="font-semibold text-yellow-300 text-sm">35th Annual General Membership Assembly</h3>
-                <p class="text-xs">BILECO invites all member-consumer-owners...</p>
-            </li>
-        </ul>
-    </div>
+<div class="max-w-7xxl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 pt-20">
+    <!-- News & Events-->
+<div class="bg-[#002D62] p-4 text-white min-h-[250px]">
+    <h2 class="text-lg font-bold text-yellow-500">NEWS & EVENTS</h2>
+    <?php 
+    $newsCounter = 0; // Counter to track the number of displayed news
+    foreach ($newsList as $news): 
+        if ($newsCounter >= 5) break; // Stop after displaying 5 news items
+        $newsCounter++;
+    ?>
+        <div class="bg-[#002D62] p-4 rounded-md shadow-md flex items-start space-x-4">
+            <?php if (!empty($news['image'])): ?>
+                <img src="/he/uploads/<?php echo htmlspecialchars($news['image']); ?>" 
+                     onerror="this.style.display='none';"
+                     class="w-32 h-32 object-cover rounded-md flex-shrink-0">
+            <?php endif; ?>
+
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-yellow-400">
+                    <?php echo htmlspecialchars($news['title']); ?>
+                </h3>
+
+                <p class="text-sm text-gray-400">
+                    <i class="fas fa-clock mr-1"></i> <?php echo htmlspecialchars($news['date']); ?>
+                </p>
+
+                <?php
+                    $content = nl2br(htmlspecialchars($news['content']));
+                    $shortContent = strlen($news['content']) > 200 ? substr($news['content'], 0, 200) . "..." : $news['content'];
+                ?>
+
+                <p class="mt-2 text-white text-sm">
+                    <?php echo nl2br(htmlspecialchars($shortContent)); ?>
+                </p>
+
+                <?php if (strlen($news['content']) > 200): ?>
+                    <button class="text-blue-300 hover:underline continue-reading" 
+                            onclick="openModal('<?php echo addslashes($news['title']); ?>', 
+                                               `<?php echo addslashes($content); ?>`, 
+                                               '<?php echo !empty($news['image']) ? '/he/uploads/' . addslashes($news['image']) : ''; ?>')">
+                        Continue Reading
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
     
     <!-- Sidebar Section -->
     <div class="bg-white p-4 border border-gray-300 min-h-[250px]">
@@ -281,6 +318,38 @@ if ($user_status === 'online') {
     <img src="assets/images/backgrounds/posts.png" alt="Descriptive Image" class="max-w-[390px] h-[250px]">
 </div>    
         </div>
+
+         <!-- Modal -->
+<div id="newsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg max-w-[900px] w-full max-h-[90vh] overflow-y-auto relative">
+        <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-black text-xl">&times;</button>
+        <h2 id="modalTitle" class="text-2xl font-bold mb-4"></h2>
+        <img id="modalImage" src="" alt="News Image" class="w-full max-h-96 object-contain rounded-md mb-4 hidden">
+        <p id="modalContent" class="text-gray-700"></p>
+        <button onclick="closeModal()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full">Close</button>
+    </div>
+</div>
+
+<script>
+    function openModal(title, content, image) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalContent').innerHTML = content;
+
+        const imgElement = document.getElementById('modalImage');
+        if (image) {
+            imgElement.src = image;
+            imgElement.classList.remove('hidden');
+        } else {
+            imgElement.classList.add('hidden');
+        }
+
+        document.getElementById('newsModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('newsModal').classList.add('hidden');
+    }
+</script>
         
 <?php
 include 'components/links.php';

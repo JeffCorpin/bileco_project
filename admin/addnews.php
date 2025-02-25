@@ -6,6 +6,11 @@ include '../components/header.php';
 $database = new conn();
 $conn = $database->conn;
 
+// Pagination settings
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
 // Generate CSRF Token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -104,8 +109,16 @@ if (isset($_GET['delete'])) {
     exit();
 }
 
-// Fetch news
-$stmt = $conn->prepare("SELECT * FROM news ORDER BY date DESC");
+// Fetch total news count
+$totalQuery = $conn->query("SELECT COUNT(*) as total FROM news");
+$totalResult = $totalQuery->fetch(PDO::FETCH_ASSOC);
+$totalNews = $totalResult['total'];
+$totalPages = ceil($totalNews / $limit);
+
+// Fetch news for the current page
+$stmt = $conn->prepare("SELECT * FROM news ORDER BY date DESC LIMIT :limit OFFSET :offset");
+$stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $newsList = $stmt->fetchAll();
 ?>
@@ -123,15 +136,16 @@ $newsList = $stmt->fetchAll();
             <input type="text" name="title" id="title" placeholder="News Title" required class="w-full px-4 py-2 border rounded mb-2">
             <textarea name="content" id="content" placeholder="News Content" class="w-full px-4 py-2 border rounded mb-2 min-h-[200px]"></textarea>
             <input type="date" name="date" id="date" class="w-full px-4 py-2 border rounded mb-2">
-            <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded mb-2">
+            <input type="file" name="image" accept="image/*" required class="w-full px-4 py-2 border rounded mb-2">
             <div id="imagePreview"></div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+            <button type="button" onclick="window.location.reload();" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
         </form>
     </div>
 
-    <div class="max-w-6xl mx-auto mt-6">
-        <h2 class="text-2xl font-bold mb-4">News & Events</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md">
+            <h2 class="text-2xl font-bold mb-4">News & Events</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <?php foreach ($newsList as $news): ?>
                     <div class="bg-white p-4 rounded-md shadow-md">
                         <?php if (!empty($news['image'])): ?>
@@ -139,37 +153,65 @@ $newsList = $stmt->fetchAll();
                         <?php endif; ?>
                         <h3 class="text-xl font-bold"><?php echo htmlspecialchars($news['title']); ?></h3>
                         <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($news['date']); ?></p>
+                        <button class="text-blue-500" onclick="showNewsModal(
+                            `<?php echo addslashes($news['title']); ?>`, 
+                            `<?php echo addslashes($news['content']); ?>`, 
+                            `<?php echo $news['date']; ?>`, 
+                            `<?php echo $news['image']; ?>`
+                )">
+                    Continue Reading
+                </button>
 
-                        <button class="text-blue-500" onclick="showNewsModal(`<?php echo addslashes($news['title']); ?>`, `<?php echo addslashes($news['content']); ?>`, `<?php echo $news['date']; ?>`, `<?php echo $news['image']; ?>`)">Continue Reading</button>
-                         <!-- Edit Button (Pencil Icon) -->
-                    <button onclick="editNews(
-                        `<?php echo $news['id']; ?>`, 
-                        `<?php echo addslashes($news['title']); ?>`, 
-                        `<?php echo addslashes($news['content']); ?>`, 
-                        `<?php echo $news['date']; ?>`
-                    )" class="ml-4 text-gray-600 hover:text-blue-500">
-                        ✏️
-                    </button>
+                <button onclick="editNews(
+                    `<?php echo $news['id']; ?>`, 
+                    `<?php echo addslashes($news['title']); ?>`, 
+                    `<?php echo addslashes($news['content']); ?>`, 
+                    `<?php echo $news['date']; ?>`
+                )" class="ml-4 text-gray-600 hover:text-blue-500">
+                    ✏️
+                </button>
 
-                    <!-- Delete Button (Trash Icon) -->
-                    <button onclick="confirmDelete(`<?php echo $news['id']; ?>`)" class="ml-2 text-gray-600 hover:text-red-500">
-                        🗑️
-                    </button>
-                    </div>
-                <?php endforeach; ?>
+                <button onclick="confirmDelete(`<?php echo $news['id']; ?>`)" class="ml-2 text-gray-600 hover:text-red-500">
+                    🗑️
+                </button>
             </div>
-        </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
-<!-- Modal -->
+         <!-- Pagination -->
+         <div class="max-w-6xl mx-auto p-4 text-center">
+            <?php if ($totalPages > 1): ?>
+                <div class="inline-flex -space-x-px">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?php echo $page - 1; ?>" class="px-3 py-1 border rounded-l bg-gray-200">&laquo; Prev</a>
+                    <?php endif; ?>
+                    
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?php echo $i; ?>" class="px-3 py-1 border <?php echo ($i == $page) ? 'bg-blue-500 text-white' : 'bg-gray-200'; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+                    
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=<?php echo $page + 1; ?>" class="px-3 py-1 border rounded-r bg-gray-200">Next &raquo;</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+    </div>
+   
+</div>
+    
+    <!-- Modal -->
 <div id="newsModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-[1200px] w-full max-h-[90vh] overflow-y-auto relative">
         <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-black text-2xl">&times;</button>
         <h2 id="modalTitle" class="text-2xl font-bold mb-2"></h2>
-        <p id="modalDate" class="text-gray-500 text-sm mb-4"></p>
+        <p class="text-gray-500 text-sm mb-4"><strong>Date:</strong> <span id="modalDate"></span></p>
         <img id="modalImage" class="w-full max-h-96 object-contain mb-4 hidden">
-        <p id="modalContent" class="text-gray-700"></p>
+        <p id="modalContent" class="text-gray-700 text-justify"></p>
         <button onclick="closeModal()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full">Close</button>
     </div>
 </div>
@@ -177,8 +219,11 @@ $newsList = $stmt->fetchAll();
 <script>
 function showNewsModal(title, content, date, image) {
     document.getElementById("modalTitle").innerText = title;
-    document.getElementById("modalDate").innerText = date;
-    document.getElementById("modalContent").innerHTML = content;
+    document.getElementById("modalDate").innerText = date; // Display date
+
+    // Preserve new lines in content by converting them to <br>
+    const formattedContent = content.replace(/\n/g, "<br>");
+    document.getElementById("modalContent").innerHTML = formattedContent;
 
     const modalImage = document.getElementById("modalImage");
     if (image) {
@@ -194,6 +239,7 @@ function showNewsModal(title, content, date, image) {
 function closeModal() {
     document.getElementById("newsModal").classList.add("hidden");
 }
+
 </script>
 
 <script>
