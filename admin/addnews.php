@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['csrf_token']) && $_POS
     <?php include 'navbar-a.php'; ?>
     <div class="flex-1 overflow-y-auto p-6 bg-gray-100">
         <div class="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md">
-            <h2 class="text-2xl font-bold mb-4"><?= $newsData['id'] ? "Edit News" : "Add News"; ?></h2>
+            <h2 class="text-2xl font-bold mb-4"><?= $newsData['id'] ? "Edit News & Events" : "Add News & Events"; ?></h2>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                 <input type="hidden" name="id" value="<?= htmlspecialchars($newsData['id']) ?>">

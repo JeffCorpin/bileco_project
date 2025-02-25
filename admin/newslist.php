@@ -52,13 +52,13 @@ $newsList = $stmt->fetchAll();
                                 Continue Reading
                             </button>
                             <button onclick="editNews(<?php echo $news['id']; ?>)" class="ml-4 text-gray-600 hover:text-blue-500">
-                                ✏️ 
+                                ✏️Edit
                             </button>
 
 
                             <button onclick="confirmDelete(<?php echo $news['id']; ?>)" 
                                 class="ml-2 text-gray-600 hover:text-red-500">
-                                🗑️
+                                🗑️Delete
                             </button>
 
                         </div>
