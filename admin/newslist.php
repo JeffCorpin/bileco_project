@@ -41,7 +41,9 @@ $newsList = $stmt->fetchAll();
                             <img src="../uploads/<?php echo htmlspecialchars($news['image']); ?>" class="w-full max-h-96 object-contain mt-2 rounded-md">
                         <?php endif; ?>
                         <h3 class="text-xl font-bold"><?php echo htmlspecialchars($news['title']); ?></h3>
-                        <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($news['date']); ?></p>
+                        <p class="text-gray-600 text-sm">
+    <?php echo date("F j, Y", strtotime($news['date'])); ?>
+</p>
                         <div class="mt-2 flex space-x-2">
                             <button class="text-blue-500" onclick="showNewsModal(
                                 `<?php echo addslashes($news['title']); ?>`, 

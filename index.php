@@ -231,7 +231,8 @@ if ($user_status === 'online') {
                 </h3>
 
                 <p class="text-sm text-gray-400">
-                    <i class="fas fa-clock mr-1"></i> <?php echo htmlspecialchars($news['date']); ?>
+                <i class="fas fa-calendar mr-2"></i> 
+                <?php echo date("F j, Y", strtotime($news['date'])); ?>
                 </p>
 
                 <?php

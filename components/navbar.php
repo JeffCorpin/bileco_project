@@ -4,6 +4,7 @@
 $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <script src="https://cdn.tailwindcss.com"></script>
+
 <nav x-data="{ isOpen: false }" class="relative bg-[#13274F] text-white sticky top-0 z-30 hidden lg:block">
     <div class="container px-6 py-3 mx-auto flex justify-between items-center">
         <!-- Logo -->
