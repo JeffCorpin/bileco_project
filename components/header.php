@@ -48,7 +48,7 @@
 </header>
 
 <!-- Floating Chatbot Button -->
-<button id="chatbotButton" class="fixed bottom-6 right-6 bg-blue-600 text-white w-16 h-16 flex justify-center items-center rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110">
+<button id="chatbotButton" class="fixed bottom-6 right-6 bg-blue-600 text-white w-16 h-16 flex justify-center items-center rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110 z-50">
     <i class="fas fa-robot text-2xl"></i>
 </button>
 
@@ -131,7 +131,7 @@
             } else if (lowerCaseMessage.includes("help")) {
                 response = "Sure! Please describe the issue you're facing.";
             } else if (lowerCaseMessage.includes("contact")) {
-                response = "You can contact us at bileco@gmail.com 📧";
+                response = "You can contact us at bileco1973@gmail.com 📧 or see in navigation contact for more.";
             } else if (lowerCaseMessage.includes("services")) {
                 response = "We offer billing inquiries, account support, and technical assistance.";
             } else if (lowerCaseMessage.includes("thank you")) {
